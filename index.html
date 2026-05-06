@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facundo Zayas — Data Analyst</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0f0d;
+      --bg2: #141512;
+      --accent: #9fe1cb;
+      --accent2: #5dcaa5;
+      --accent-dim: rgba(159,225,203,0.08);
+      --text: #e8e6df;
+      --muted: #7a7870;
+      --border: rgba(255,255,255,0.07);
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      min-height: 100vh;
+      cursor: none;
+    }
+
+    .cursor {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .cursor-ring {
+      width: 28px; height: 28px;
+      border: 1px solid rgba(159,225,203,0.4);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transition: width 0.2s, height 0.2s, border-color 0.2s;
+    }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 0 28px; }
+
+    /* HEADER */
+    header {
+      padding: 64px 0 48px;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp 0.6s ease both;
+    }
+    .header-inner { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 24px; }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent2);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: block;
+    }
+    h1 {
+      font-family: var(--mono);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 400px;
+    }
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .meta-row { display: flex; align-items: center; gap: 6px; }
+    .dot-accent { width: 5px; height: 5px; border-radius: 50%; background: var(--accent2); flex-shrink: 0; }
+    .dot-green  { width: 5px; height: 5px; border-radius: 50%; background: #5dcaa5; flex-shrink: 0; animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* NAV */
+    nav {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 28px;
+      font-family: var(--mono);
+      font-size: 12px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    nav a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    nav a:hover { color: var(--accent); }
+
+    /* SECTIONS */
+    section { padding: 48px 0; border-bottom: 1px solid var(--border); }
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* PROJECTS */
+    .projects { display: flex; flex-direction: column; }
+    .project {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      cursor: none;
+    }
+    .project:last-child { border-bottom: none; }
+    .project::before {
+      content: '';
+      position: absolute;
+      left: -28px; right: -28px; top: 0; bottom: 0;
+      background: var(--accent-dim);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .project:hover::before { opacity: 1; }
+    .project:hover .project-title { color: var(--accent); }
+    .project:hover .arrow { transform: translate(3px, -3px); color: var(--accent); }
+    .project:hover .tag-pill { border-color: rgba(159,225,203,0.2); color: var(--accent2); }
+
+    .project-left { position: relative; z-index: 1; }
+    .project-title {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+      transition: color 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .project-desc { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 14px; max-width: 520px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag-pill {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 3px 9px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--muted);
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .project-right { position: relative; z-index: 1; text-align: right; padding-top: 2px; }
+    .arrow { font-size: 18px; color: var(--muted); transition: transform 0.15s, color 0.15s; display: block; margin-bottom: 8px; }
+    .project-year { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+    .type-badge {
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .type-sql     { background: rgba(93,202,165,0.1);  color: #5dcaa5; border: 1px solid rgba(93,202,165,0.2); }
+    .type-powerbi { background: rgba(239,159,39,0.1);  color: #ba7517; border: 1px solid rgba(239,159,39,0.2); }
+    .type-js      { background: rgba(55,138,221,0.1);  color: #378add; border: 1px solid rgba(55,138,221,0.2); }
+
+    /* EXPERIENCE */
+    .experience { display: flex; flex-direction: column; gap: 0; }
+
+    .exp-item {
+      display: grid;
+      grid-template-columns: 1fr;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .exp-item:last-child { border-bottom: none; }
+
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .exp-role {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .exp-company {
+      font-size: 13px;
+      color: var(--accent2);
+    }
+    .exp-meta {
+      text-align: right;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .exp-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .exp-bullets li {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      padding-left: 16px;
+      position: relative;
+    }
+    .exp-bullets li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--border);
+      font-family: var(--mono);
+    }
+    .exp-bullets li strong {
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    /* SKILLS */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .skill-group { background: var(--bg); padding: 20px; }
+    .skill-group-name {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .skill-list { list-style: none; font-size: 13px; color: var(--muted); line-height: 2; font-family: var(--mono); }
+
+    /* ABOUT */
+    .about-text { font-size: 14px; color: var(--muted); line-height: 1.85; max-width: 600px; }
+    .about-text strong { color: var(--text); font-weight: 400; }
+
+    /* CONTACT */
+    .links { display: flex; flex-wrap: wrap; gap: 12px; }
+    .link-btn {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      cursor: none;
+    }
+    .link-btn:hover { border-color: var(--accent2); color: var(--accent); background: var(--accent-dim); }
+    .link-btn.primary { border-color: var(--accent2); color: var(--accent); }
+
+    footer {
+      padding: 32px 0;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .project { animation: fadeUp 0.5s ease both; }
+    .project:nth-child(1) { animation-delay: 0.15s; }
+    .project:nth-child(2) { animation-delay: 0.23s; }
+    .project:nth-child(3) { animation-delay: 0.31s; }
+    .exp-item { animation: fadeUp 0.5s ease both; }
+    .exp-item:nth-child(1) { animation-delay: 0.15s; }
+    .exp-item:nth-child(2) { animation-delay: 0.25s; }
+    .exp-item:nth-child(3) { animation-delay: 0.35s; }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 24px; }
+      .header-meta { align-items: flex-start; }
+      .project { grid-template-columns: 1fr; }
+      .project-right { display: none; }
+      .exp-meta { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="container">
+
+  <header>
+    <div class="header-inner">
+      <div>
+        <span class="eyebrow">Data Analyst · BI · Operations Analytics</span>
+        <h1>Facundo Zayas</h1>
+        <p class="subtitle">3+ years turning complex operational data into KPI dashboards and strategic decisions — aviation scheduling, people analytics, and ops tooling.</p>
+      </div>
+      <div class="header-meta">
+        <div class="meta-row"><span class="dot-green"></span> Berlin · open to work</div>
+        <div class="meta-row"><span class="dot-accent"></span> SQL · Power BI · DAX</div>
+        <div class="meta-row"><span class="dot-accent"></span> EN · ES · PT</div>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <a href="#projects">projects</a>
+    <a href="#experience">experience</a>
+    <a href="#skills">skills</a>
+    <a href="#contact">contact</a>
+  </nav>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-label">projects</div>
+    <div class="projects">
+
+      <a class="project" href="https://github.com/facundozayas/SQL-Portfolio-it-salary-analysis" target="_blank">
+        <div class="project-left">
+          <div class="project-title">
+            IT Salary Analysis
+            <span class="type-badge type-sql">SQL</span>
+          </div>
+          <div class="project-desc">
+            10 strategic business questions answered on a global IT salary dataset — remote vs in-office pay gaps, salary evolution by year, and top-paying role/experience/location combinations. Uses window functions and outlier filtering for reliable insights.
+          </div>
+          <div class="tags">
+            <span class="tag-pill">SQL</span>
+            <span class="tag-pill">MySQL</span>
+            <span class="tag-pill">Data Analysis</span>
+            <span class="tag-pill">Salary Benchmarking</span>
+          </div>
+        </div>
+        <div class="project-right">
+          <span class="arrow">↗</span>
+          <div class="project-year">2025</div>
+        </div>
+      </a>
+
+      <a class="project" href="https://github.com/facundozayas/HR-Headcount-PowerBI" target="_blank">
+        <div class="project-left">
+          <div class="project-title">
+            HR Headcount & People Analytics
+            <span class="type-badge type-powerbi">Power BI</span>
+          </div>
+          <div class="project-desc">
+            4-page Power BI dashboard for HR stakeholders — headcount evolution 2016–2019, turnover drivers, salary quartile analysis, gender equity, and manager span of control. Built with Power Query, DAX measures, and a custom calendar dimension.
+          </div>
+          <div class="tags">
+            <span class="tag-pill">Power BI</span>
+            <span class="tag-pill">DAX</span>
+            <span class="tag-pill">Power Query</span>
+            <span class="tag-pill">People Analytics</span>
+          </div>
+        </div>
+        <div class="project-right">
+          <span class="arrow">↗</span>
+          <div class="project-year">2025</div>
+        </div>
+      </a>
+
+      <a class="project" href="https://github.com/facundozayas/4padel-inventory" target="_blank">
+        <div class="project-left">
+          <div class="project-title">
+            4Padel Berlin — Inventory Web App
+            <span class="type-badge type-js">JavaScript</span>
+          </div>
+          <div class="project-desc">
+            Full inventory management app deployed at a real padel club in Berlin. PIN-based login for 9 staff, Google Sheets API as live backend, Chart.js dashboards, shift-based stock tracking — eliminated stockout events that previously occurred up to 5 days/month.
+          </div>
+          <div class="tags">
+            <span class="tag-pill">JavaScript</span>
+            <span class="tag-pill">Google Sheets API</span>
+            <span class="tag-pill">Chart.js</span>
+            <span class="tag-pill">Apps Script</span>
+          </div>
+        </div>
+        <div class="project-right">
+          <span class="arrow">↗</span>
+          <div class="project-year">2025</div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="section-label">experience</div>
+    <div class="experience">
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div>
+            <div class="exp-role">Operations & Sales Analyst</div>
+            <div class="exp-company">4Padel Berlin</div>
+          </div>
+          <div class="exp-meta">
+            Berlin, Germany<br>
+            Apr 2025 – Present
+          </div>
+        </div>
+        <ul class="exp-bullets">
+          <li>Designed and deployed an inventory system (Google Sheets + AppSheet + Apps Script) tracking <strong>25–30 SKUs</strong> in real time with automated low-stock alerts — eliminating stockout events that previously occurred up to <strong>5 days/month</strong>.</li>
+          <li>Developing a demand forecasting model to project monthly court booking volumes and estimate revenue using seasonal trend analysis.</li>
+        </ul>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div>
+            <div class="exp-role">Airline Scheduling Analyst</div>
+            <div class="exp-company">Aerolíneas Argentinas</div>
+          </div>
+          <div class="exp-meta">
+            Buenos Aires, Argentina<br>
+            Aug 2022 – Apr 2025
+          </div>
+        </div>
+        <ul class="exp-bullets">
+          <li>Planned and optimized annual flight schedules for a <strong>52-aircraft narrow-body fleet (~300 daily flights)</strong>, achieving <strong>5% YoY improvement</strong> in fleet utilization across Operations, Maintenance, Commercial, and Airport teams.</li>
+          <li>Built a 5-minute interval slot utilization model for Buenos Aires Aeroparque — reduced hub peak slot requirements from <strong>34 to 30 (-12%)</strong>.</li>
+          <li>Optimized departure windows on high-demand routes, enabling <strong>+20% average fares</strong> and <strong>95% load factor</strong> on Bariloche routes during the 2024 peak season.</li>
+          <li>Built executive Power BI dashboards (utilization, OTP, seat distribution, manpower) and maintained <strong>SQL/Power Query pipelines</strong> supporting daily and strategic decisions across Operations and Commercial.</li>
+        </ul>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div>
+            <div class="exp-role">Process Improvement Analyst</div>
+            <div class="exp-company">Aerolíneas Argentinas</div>
+          </div>
+          <div class="exp-meta">
+            Buenos Aires, Argentina<br>
+            Sep 2021 – Aug 2022
+          </div>
+        </div>
+        <ul class="exp-bullets">
+          <li>Market and route performance analysis across <strong>6 regional countries</strong> using DDS and OAG datasets (<strong>+1M records</strong>), identifying demand trends for network strategy decisions.</li>
+          <li>Analyzed demand, competition, and scheduling feasibility for the Buenos Aires–Rome route relaunch and capacity expansions on São Paulo (<strong>+50%</strong>) and Santiago (<strong>+40%</strong>).</li>
+          <li>Mapped end-to-end schedule publication workflow, identified handoff bottlenecks, and implemented changes that reduced cross-team errors from <strong>12% to 5%</strong>.</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-label">skills</div>
+    <div class="skills-grid">
+      <div class="skill-group">
+        <div class="skill-group-name">BI & Data</div>
+        <ul class="skill-list">
+          <li>SQL · MySQL</li>
+          <li>Power BI</li>
+          <li>DAX</li>
+          <li>Power Query</li>
+          <li>ETL pipelines</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-name">Tools</div>
+        <ul class="skill-list">
+          <li>Excel (advanced)</li>
+          <li>Google Sheets</li>
+          <li>Apps Script</li>
+          <li>AppSheet</li>
+          <li>Python (learning)</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-name">Domain</div>
+        <ul class="skill-list">
+          <li>KPI Design</li>
+          <li>Data Modeling</li>
+          <li>Fleet Scheduling</li>
+          <li>Process Improvement</li>
+          <li>Operations Research</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-name">Languages</div>
+        <ul class="skill-list">
+          <li>Spanish (native)</li>
+          <li>English (C1)</li>
+          <li>Portuguese (B1)</li>
+          <li>German (A2)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-label">contact</div>
+    <div class="links">
+      <a class="link-btn primary" href="CV_FacundoZayas_DataAnalyst.pdf" download>download cv ↓</a>
+      <a class="link-btn primary" href="https://github.com/facundozayas" target="_blank">github ↗</a>
+      <a class="link-btn" href="https://linkedin.com/in/facundo-zayas" target="_blank">linkedin ↗</a>
+      <a class="link-btn" href="mailto:zayasfacundonicolas@gmail.com">email ↗</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>facundo zayas · berlin · 2026</span>
+    <span>facundozayas.github.io</span>
+  </footer>
+
+</div>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = (mx - 3) + 'px';
+    cursor.style.top  = (my - 3) + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx - 14) * 0.12;
+    ry += (my - ry - 14) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.width = '44px';
+      ring.style.height = '44px';
+      ring.style.borderColor = 'rgba(159,225,203,0.7)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width = '28px';
+      ring.style.height = '28px';
+      ring.style.borderColor = 'rgba(159,225,203,0.4)';
+    });
+  });
+</script>
+
+</body>
+</html>
